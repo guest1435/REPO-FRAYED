@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Frayed SMP Admin</title>
+<style>
+:root{--bg:#0b0b10;--fg:#f2f2f5;--mut:#9a9aa8;--card:#15151d;--line:#2a2a38;--acc:#c8ff3d;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 system-ui,sans-serif}
+main{max-width:720px;margin:auto;padding:30px 5vw}
+h1{color:var(--acc);margin:0 0 4px}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px}
+label{display:block;margin:16px 0 6px;color:var(--mut);font-size:14px}
+input,textarea{width:100%;background:#0b0b10;color:var(--fg);border:1px solid var(--line);border-radius:10px;padding:12px;font:inherit}
+textarea{min-height:100px}.btn{background:var(--acc);color:#000;border:0;border-radius:999px;padding:12px 26px;font-weight:600;cursor:pointer;margin-top:18px;font-size:16px}
+#msg{margin-top:12px;color:var(--acc)}p.s{color:var(--mut);margin:0 0 18px}
+</style>
+</head>
+<body>
+<main><h1>Frayed SMP Admin</h1><p class="s">Edit the settings, save, then tell Claude "sync the Frayed site" to push them to the public page.</p>
+<div class="card" id="box">Loading...</div></main>
+<script>
+(function(){
+var D={tagline:"A chill, community-driven Minecraft survival server. Build, explore, and make memories with friends.",about:"Frayed SMP is a friendly Survival Multiplayer world where everyone is welcome. Whether you're a builder, a redstone wizard, or just here to hang out, there's a spot for you. Join our Discord to meet the community.",ip:"Coming soon – will be posted here and on Discord!",version:"Java & Bedrock Edition",discord:"https://discord.gg/AvvsRYr9m",rules:["Be kind and respectful to everyone.","No griefing, stealing, or destroying other players' builds.","No cheating, hacked clients, or exploits.","No hate speech, harassment, or inappropriate content.","Keep chat friendly and avoid spam.","Listen to staff and follow their decisions.","Have fun!"]};
+var box=document.getElementById('box');
+function esc(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML.replace(/"/g,'&quot;')}
+function f(id,l,v,a){return '<label>'+l+'</label>'+(a?'<textarea id="'+id+'">'+esc(v)+'</textarea>':'<input id="'+id+'" value="'+esc(v)+'">')}
+function form(){
+ box.innerHTML=f('t','Tagline',D.tagline,1)+f('a','About text',D.about,1)+f('i','Minecraft server IP',D.ip)+f('v','Version / edition',D.version)+f('d','Discord link',D.discord)+f('r','Rules (one per line)',D.rules.join('\n'),1)+'<button class="btn" id="save">Save</button><div id="msg"></div>';
+ document.getElementById('r').style.minHeight='200px';
+}
+(async function(){
+ var db=null;try{db=await claude.use('db')}catch(e){}
+ var u=null;try{u=await claude.use('user')}catch(e){}
+ if(!db||!u||!(u.canEdit&&u.canEdit())){box.textContent='Only the owner, signed in to Claude, can use this admin page.';return}
+ var doc=db.doc('site/settings');
+ try{var s=await doc.get();if(s&&s.exists!==false){var x=typeof s.data==='function'?s.data():s;if(x&&x.rules)D=x}}catch(e){}
+ form();
+ document.getElementById('save').onclick=async function(){
+  var v=function(i){return document.getElementById(i).value.trim()};
+  var nd={tagline:v('t'),about:v('a'),ip:v('i'),version:v('v'),discord:v('d'),rules:v('r').split('\n').map(function(x){return x.trim()}).filter(Boolean)};
+  var m=document.getElementById('msg');
+  try{await doc.set(nd);D=nd;m.textContent='Saved. Now tell Claude: sync the Frayed site.'}catch(e){m.textContent='Could not save: '+(e&&e.code||e)}
+ };
+})();
+})();
+</script>
+</body>
+</html>

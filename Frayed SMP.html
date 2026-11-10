@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Frayed SMP</title>
+<link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0b10;--fg:#f2f2f5;--mut:#9a9aa8;--card:#15151d;--line:#2a2a38;--acc:#c8ff3d;--acc2:#7b5cff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#0b0b10}}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 Inter,system-ui,sans-serif;overflow-x:hidden}
+.bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(600px 400px at 15% 10%,#7b5cff33,transparent),radial-gradient(500px 400px at 85% 30%,#c8ff3d22,transparent),radial-gradient(600px 500px at 50% 100%,#ff3d7a22,transparent);animation:drift 14s ease-in-out infinite alternate}
+@keyframes drift{to{transform:scale(1.15) translateY(-20px)}}
+nav{display:flex;justify-content:space-between;align-items:center;padding:16px 6vw;position:sticky;top:0;backdrop-filter:blur(12px);background:#0b0b10aa;z-index:5;border-bottom:1px solid var(--line)}
+nav b{font-family:'Permanent Marker',cursive;font-size:22px;letter-spacing:1px}
+nav a{color:var(--mut);text-decoration:none;margin-left:18px;font-size:14px}nav a:hover{color:var(--acc)}
+.hero{text-align:center;padding:12vh 6vw 10vh}
+.logo{display:inline-block;background:#fff;color:#000;border-radius:28px;padding:26px 40px 14px;transform:rotate(-3deg);box-shadow:0 0 60px #c8ff3d44;animation:float 4s ease-in-out infinite}
+.logo h1{font-family:'Permanent Marker',cursive;font-size:clamp(54px,13vw,120px);margin:0;line-height:1}
+.logo small{display:block;font-family:'Permanent Marker',cursive;font-size:18px;letter-spacing:6px}
+@keyframes float{50%{transform:rotate(-1deg) translateY(-10px)}}
+.tag{font-size:clamp(18px,3vw,26px);color:var(--mut);margin:34px auto 28px;max-width:640px}
+.btn{display:inline-block;padding:14px 28px;border-radius:999px;background:var(--acc);color:#000;font-weight:600;text-decoration:none;border:0;cursor:pointer;font-size:16px;margin:6px;transition:.2s}
+.btn:hover{transform:translateY(-3px) scale(1.04);box-shadow:0 10px 30px #c8ff3d55}
+.btn.o{background:transparent;color:var(--fg);border:1px solid var(--line)}
+section{padding:8vh 6vw;max-width:1000px;margin:auto}
+h2{font-family:'Permanent Marker',cursive;font-size:clamp(30px,5vw,44px);margin:0 0 20px;color:var(--acc)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px}
+.rules{display:grid;gap:14px;counter-reset:r}
+.rule{display:flex;gap:16px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 20px;transition:.25s}
+.rule:hover{transform:translateX(8px);border-color:var(--acc)}
+.rule::before{counter-increment:r;content:counter(r);font-family:'Permanent Marker',cursive;font-size:26px;color:var(--acc2);min-width:34px}
+.ip{font:600 22px ui-monospace,monospace;background:#000;border:1px dashed var(--acc);border-radius:12px;padding:14px 20px;display:inline-block;cursor:pointer;color:var(--acc);word-break:break-all}
+footer{text-align:center;color:var(--mut);padding:40px;font-size:14px}
+.fade{opacity:0;transform:translateY(24px);transition:.7s}.fade.in{opacity:1;transform:none}
+label{display:block;margin:16px 0 6px;color:var(--mut);font-size:14px}
+input,textarea{width:100%;background:#0b0b10;color:var(--fg);border:1px solid var(--line);border-radius:10px;padding:12px;font:inherit}
+textarea{min-height:120px}
+.msg{margin-top:14px;color:var(--acc)}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div id="app"></div>
+<script id="data" type="application/json">{"tagline":"A chill, community-driven Minecraft survival server. Build, explore, and make memories with friends.","about":"Frayed SMP is a friendly Survival Multiplayer world where everyone is welcome. Whether you're a builder, a redstone wizard, or just here to hang out, there's a spot for you. Join our Discord to meet the community.","ip":"Coming soon – will be posted here and on Discord!","version":"Java & Bedrock Edition","discord":"https://discord.gg/AvvsRYr9m","rules":["Be kind and respectful to everyone.","No griefing, stealing, or destroying other players' builds.","No cheating, hacked clients, or exploits.","No hate speech, harassment, or inappropriate content.","Keep chat friendly and avoid spam.","Listen to staff and follow their decisions.","Have fun!"]}</script>
+<script>
+(function(){
+var D=JSON.parse(document.getElementById('data').textContent);
+var app=document.getElementById('app');
+function esc(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML}
+function safeUrl(u){return /^https?:\/\//i.test(u)?u:'#'}
+function render(){
+ app.innerHTML='<div id="site"><nav><b>Frayed</b><div><a href="#about">About</a><a href="#rules">Rules</a><a href="#join">Join</a></div></nav>'+
+ '<div class="hero"><div class="logo"><h1>Frayed</h1><small>SMP</small></div><p class="tag">'+esc(D.tagline)+'</p>'+
+ '<a class="btn" href="'+esc(safeUrl(D.discord))+'" target="_blank" rel="noopener">Join our Discord</a><a class="btn o" href="#join">Server IP</a></div>'+
+ '<section id="about" class="fade"><h2>About</h2><div class="card">'+esc(D.about)+'</div></section>'+
+ '<section id="rules" class="fade"><h2>Server Rules</h2><div class="rules">'+D.rules.map(function(r){return '<div class="rule">'+esc(r)+'</div>'}).join('')+'</div></section>'+
+ '<section id="join" class="fade"><h2>Join the Server</h2><div class="card"><p>Minecraft server: <b>'+esc(D.version)+'</b></p><div class="ip" id="ip" title="Click to copy">'+esc(D.ip)+'</div><p style="color:var(--mut)">Click the IP to copy it. Then join our Discord for updates and to meet everyone.</p>'+
+ '<a class="btn" href="'+esc(safeUrl(D.discord))+'" target="_blank" rel="noopener">Open Discord</a></div></section>'+
+ '<footer>Frayed SMP · Be kind. Have fun.</footer></div>';
+ var ip=document.getElementById('ip');
+ ip.onclick=function(){try{navigator.clipboard.writeText(D.ip);ip.style.opacity=.6;setTimeout(function(){ip.style.opacity=1},400)}catch(e){}};
+ var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting)e.target.classList.add('in')})},{threshold:.1});
+ document.querySelectorAll('.fade').forEach(function(el){io.observe(el)});
+}
+render();
+})();
+</script>
+</body>
+</html>
